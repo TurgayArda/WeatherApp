@@ -33,14 +33,12 @@ extension CityWeatherViewModel {
 
 extension CityWeatherViewModel {
     func loadForecast(key: String) {
-//        guard let cityKey = Int(key) else { return }
-//        guard let url = URL(string: WeatherNetworkConstant.ForecastNetwork.forecastURL(key: cityKey)) else { return }
         guard let url = URL(string: WeatherNetworkConstant.ForecastNetwork.forecastURL(key: key)) else { return }
         httpClient?.fetch(url: url,
-                          completion: { [delegate] (result: Result<[ForecastResult], Error>) in
+                          completion: { [delegate] (result: Result<ForecastResult, Error>) in
             switch result {
         case .success(let forecast):
-                if let dailyForecastData = forecast[0].dailyForecasts {
+                if let dailyForecastData = forecast.dailyForecasts {
                     delegate?.forecastHandleOutPut(.searchForecast(dailyForecastData))
                 }
         case .failure(let error):

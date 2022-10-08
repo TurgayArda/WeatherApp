@@ -15,34 +15,34 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.alignment = .lastBaseline
-        stackView.distribution = .equalSpacing
-        stackView.spacing = 4
+        stackView.alignment = .center
+        stackView.distribution = .fillEqually
+        stackView.spacing = 2
         return stackView
     }()
     
     
-    private lazy var  searchImage: UIImageView = {
+    private lazy var  weatherIcon: UIImageView = {
         let image = UIImageView()
-        image.clipsToBounds = true
+        image.translatesAutoresizingMaskIntoConstraints = false
         image.backgroundColor = .white
-        image.layer.cornerRadius = 8
-        image.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return image
     }()
     
-    private lazy var  searchName: UILabel = {
+    private lazy var  weatherDate: UILabel = {
         let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .boldSystemFont(ofSize: 16)
         label.textColor = .black
-        label.numberOfLines = 0
         return label
     }()
     
-    private lazy var  searchPrice: UILabel = {
+    private lazy var weathertemperature: UILabel = {
         let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .boldSystemFont(ofSize: 15)
         label.textColor = .black
+        label.textAlignment = .center
         return label
     }()
     
@@ -59,34 +59,18 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func prepareForReuse() {
-        setImage(value: "")
-    }
-    
-    private func setImage(value: String) {
-        if let url = URL(string: value) {
-            DispatchQueue.global().async {
-                let data  = try? Data(contentsOf: url)
-                
-                DispatchQueue.main.async {
-                    guard let dataTwo = data else { return }
-                    self.searchImage.image = UIImage(data: dataTwo)
-                }
-            }
-        }
-    }
-    
     private func configure() {
         contentView.addSubview(stackView)
-        stackView.addArrangedSubview(searchImage)
-        stackView.addArrangedSubview(searchName)
-        stackView.addArrangedSubview(searchPrice)
+        
+        stackView.addArrangedSubview(weatherIcon)
+        stackView.addArrangedSubview(weatherDate)
+        stackView.addArrangedSubview(weathertemperature)
         
         
-        contentView.backgroundColor = .white
-        contentView.layer.borderWidth = 1
-        contentView.layer.borderColor = UIColor.gray.cgColor
-        contentView.layer.cornerRadius = 8
+//        contentView.backgroundColor = .white
+//        contentView.layer.borderWidth = 1
+//        contentView.layer.borderColor = UIColor.gray.cgColor
+//        contentView.layer.cornerRadius = 8
         
         configureConstraints()
     }
@@ -94,21 +78,21 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
     private func configureConstraints() {
         makeImage()
         makeVStack()
-        makeName()
-        makePrice()
+        makeTemperature()
+        makeDate()
     }
     
-//    private func propertyUI(item: SearchList) {
-//        guard let name = item.trackName, let price = item.trackPrice, let image = item.artworkUrl100 else { return }
-//        
-//        searchName.text = "Name: \(name)"
-//        searchPrice.text = "Price: \(price)"
-//        setImage(value: image)
-//    }
-//    
-//    func saveModel(item: SearchList) {
-//        propertyUI(item: item)
-//    }
+    private func propertyUI(item: DailyForecast) {
+        guard let date = item.date , let temperature = item.temperature?.minimum?.value, let image = item.day?.icon else { return }
+//
+        weatherDate.text = date
+        weathertemperature.text = "\(temperature)" + "°"
+        weatherIcon.image = UIImage(named: "Image-\(image)")
+    }
+    
+    func saveModel(item: DailyForecast) {
+        propertyUI(item: item)
+    }
 }
 
 //MARK: - Constraints
@@ -125,22 +109,24 @@ extension  CityWeatherCollectionViewCell {
     
     private func makeImage() {
         NSLayoutConstraint.activate([
-            searchImage.heightAnchor.constraint(equalToConstant: contentView.frame.size.height / 1.6),
-            searchImage.widthAnchor.constraint(equalToConstant: contentView.frame.size.width),
+            weatherIcon.heightAnchor.constraint(equalToConstant: contentView.frame.size.height / 3.2),
+            weatherIcon.widthAnchor.constraint(equalToConstant: contentView.frame.size.width / 1.5),
         ])
     }
     
-    private func makeName() {
+    private func makeDate() {
         NSLayoutConstraint.activate([
-            searchName.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
-            searchName.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
+            //weatherDate.topAnchor.constraint(equalTo: weatherIcon.bottomAnchor, constant: 0),
+            weatherDate.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
+            weatherDate.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
         ])
     }
     
-    private func makePrice() {
+    private func makeTemperature() {
         NSLayoutConstraint.activate([
-            searchPrice.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
-            searchPrice.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
+            //weathertemperature.topAnchor.constraint(equalTo: weatherDate.bottomAnchor, constant: 0),
+            weathertemperature.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
+            weathertemperature.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
         ])
     }
 }

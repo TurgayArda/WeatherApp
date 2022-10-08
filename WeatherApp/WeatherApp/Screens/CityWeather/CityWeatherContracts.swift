@@ -34,7 +34,7 @@ protocol CityWeatherViewModelDelegate {
 
 protocol CityWeatherProviderProtocol {
     var delegate: CityWeatherProviderDelegate? { get set }
-    func load(value: [CityWeatherResult])
+    func load(value: [DailyForecast])
 }
 
 protocol CityWeatherProviderDelegate {

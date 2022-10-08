@@ -28,19 +28,6 @@ class CityWeatherVC: UIViewController {
         return search
     }()
     
-//    private lazy var searchListCollectionView: UICollectionView = {
-//        let layout = UICollectionViewFlowLayout()
-//        layout.scrollDirection = .vertical
-//        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        collectionView.translatesAutoresizingMaskIntoConstraints = false
-//        collectionView.backgroundColor = .systemGray6
-//        collectionView.register(
-//            SearchListPodcastCollectionViewCell.self,
-//            forCellWithReuseIdentifier: SearchListPodcastCollectionViewCell.Identifier.path.rawValue
-//        )
-//        return collectionView
-//    }()
-    
     private let cityHorizontalLocationStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -108,12 +95,11 @@ class CityWeatherVC: UIViewController {
     private lazy var temperature: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .boldSystemFont(ofSize: 18)
+        label.font = .boldSystemFont(ofSize: 22)
         label.textColor = .black
         label.numberOfLines = 1
         label.textAlignment = .left
         label.backgroundColor = .clear
-        label.text = "27.5"
         return label
     }()
     
@@ -132,7 +118,7 @@ class CityWeatherVC: UIViewController {
         label.numberOfLines = 1
         label.textAlignment = .left
         label.backgroundColor = .clear
-        label.text = "Mostly cloudy"
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
@@ -156,10 +142,43 @@ class CityWeatherVC: UIViewController {
         return stackView
     }()
     
+    private lazy var customViewinCollection: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 48
+        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        view.backgroundColor = .white
+        return view
+    }()
     
+    
+    private lazy var weatherForecast: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .boldSystemFont(ofSize: 22)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.text = "Weather Forecast"
+        //label.backgroundColor = .clear
+        return label
+    }()
+    
+    private lazy var forecastCollectionView: UICollectionView = {
+             let layout = UICollectionViewFlowLayout()
+             layout.scrollDirection = .horizontal
+             let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+             collectionView.translatesAutoresizingMaskIntoConstraints = false
+             collectionView.backgroundColor = .white
+            collectionView.register(
+                CityWeatherCollectionViewCell.self,
+            forCellWithReuseIdentifier: CityWeatherCollectionViewCell.Identifier.path.rawValue
+                                   )
+             return collectionView
+         }()
      
     //MARK: - Properties
-    
+    private var forecastCollectionProvider = CityWeatherProvider()
+    private var dailyForecastData: [DailyForecast] = []
     private var searchCityName = ""
     private var searchDateTime = ""
     
@@ -179,9 +198,9 @@ class CityWeatherVC: UIViewController {
         navigationItem.searchController = searchBar
         searchBar.searchBar.delegate = self
         cityWeatherViewModel?.delegate = self
-//        searchCollectionProvider.delegate = self
-//        searchListCollectionView.delegate = searchCollectionProvider
-//        searchListCollectionView.dataSource = searchCollectionProvider
+        forecastCollectionProvider.delegate = self
+        forecastCollectionView.delegate = forecastCollectionProvider
+        forecastCollectionView.dataSource = forecastCollectionProvider
         
         configure()
     }
@@ -191,7 +210,8 @@ class CityWeatherVC: UIViewController {
         view.addSubview(viewBackGroundImage)
         view.addSubview(cityVerticalLocationStackView)
         view.addSubview(cityVerticalWeatherInfoStackView)
-        //view.addSubview(searchListCollectionView)
+        view.addSubview(customViewinCollection)
+       
     
         cityVerticalLocationStackView.addArrangedSubview(cityHorizontalLocationStackView)
         cityVerticalLocationStackView.addArrangedSubview(dateTime)
@@ -205,14 +225,16 @@ class CityWeatherVC: UIViewController {
         cityHorizontalWeatherInfoStackView.addArrangedSubview(temperature)
         cityHorizontalWeatherInfoStackView.addArrangedSubview(weatherIcon)
         
+        customViewinCollection.addSubview(weatherForecast)
+        customViewinCollection.addSubview(forecastCollectionView)
+        
         viewBackGroundImage.image = UIImage(named: "Daytime")
-        weatherIcon.image = UIImage(systemName: "sun.min")
         
         configureConstraints()
     }
     
     private func configureConstraints() {
-        //makeCollection()
+        makeCollection()
         makeBackGroundImage()
         makeLocationStackView()
         makeAnimationView()
@@ -224,6 +246,8 @@ class CityWeatherVC: UIViewController {
         makeTemperature()
         makeWeatherIcon()
         makeWeatherPhrase()
+        makeCustomView()
+        makeWeatherForecast()
         
         configureAnimation()
     }
@@ -234,25 +258,52 @@ class CityWeatherVC: UIViewController {
         //locationAnimationView.loopMode = .loop
         locationAnimationView.animationSpeed = 0.7
         locationAnimationView.play()
-        
-        todayDate()
     }
     
-    private func todayDate() {
+    private func todayDate(dailyForecast: [DailyForecast]) {
         let todayDate = todayDateFormatter.string(from: .now)
-        dateTime.text = todayDate
-        
         let stringHour = hourDateFormatter.string(from: .now)
+        var backgroundImageTwo = UIImage()
+        var temperatureTwo = ""
+        var weatherPhraseTwo = ""
+        var weatherIconTwo = UIImage()
+        var iconNumber = 0
+        let fahrenheit = dailyForecast[0].temperature?.maximum?.value ?? 0
         let hour = Int(stringHour)!
         
         switch hour {
         case 5...18:
-            self.viewBackGroundImage.image = UIImage(named:"Daytime")
+            backgroundImageTwo = UIImage(named:"Daytime")!
+            let fahrenheit =  dailyForecast[0].temperature?.minimum?.value ?? 0
+            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
+            weatherPhraseTwo = dailyForecast[0].day?.iconPhrase ?? ""
+            iconNumber = dailyForecast[0].day?.icon ?? 0
+            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
         case 18...24:
-            self.viewBackGroundImage.image = UIImage(named: "NightDay")
+            backgroundImageTwo = UIImage(named: "NightDay")!
+            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
+            weatherPhraseTwo = dailyForecast[0].night?.iconPhrase ?? ""
+            iconNumber = dailyForecast[0].night?.icon ?? 0
+            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
         default:
-            self.viewBackGroundImage.image = UIImage(named:"NightDay")
+            backgroundImageTwo = UIImage(named:"NightDay")!
+            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
+            weatherPhraseTwo = dailyForecast[0].night?.iconPhrase ?? ""
+            iconNumber = dailyForecast[0].night?.icon ?? 0
+            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
         }
+        
+        DispatchQueue.main.async {
+            self.dateTime.text = todayDate
+            self.viewBackGroundImage.image = backgroundImageTwo
+            self.temperature.text = temperatureTwo
+            self.weatherPhrase.text = weatherPhraseTwo
+            self.weatherIcon.image = weatherIconTwo
+        }
+    }
+    
+    func calculateCelsius(fahrenheit: Int) -> Int {
+        return Int(5.0 / 9.0 * (Double(fahrenheit) - 32.0))
     }
 }
 
@@ -275,7 +326,16 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
     func forecastHandleOutPut(_ output: ForecastViewModelOutPut) {
         switch output {
         case .searchForecast(let forecastData):
-            print(forecastData[0].temperature?.maximum?.value ?? 0.0)
+            todayDate(dailyForecast: forecastData)
+            dailyForecastData.removeAll()
+            for i in 0...2 {
+                dailyForecastData.append(forecastData[i])
+            }
+            forecastCollectionProvider.load(value: dailyForecastData)
+            
+            DispatchQueue.main.async {
+                self.forecastCollectionView.reloadData()
+            }
         case .showError(let error):
             print(error)
         }
@@ -291,8 +351,13 @@ extension CityWeatherVC: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        cityWeatherViewModel?.loadSearchCity(term: "")
-        self.cityName.text = ""
+        //cityWeatherViewModel?.loadSearchCity(term: "")
+    }
+}
+
+extension CityWeatherVC: CityWeatherProviderDelegate {
+    func selected(at select: Any) {
+        print("Arda")
     }
 }
 
@@ -350,7 +415,7 @@ extension CityWeatherVC {
         NSLayoutConstraint.activate([
             cityVerticalWeatherInfoStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 88),
             cityVerticalWeatherInfoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
-            cityVerticalWeatherInfoStackView.heightAnchor.constraint(equalToConstant: view.frame.size.height / 10),
+            cityVerticalWeatherInfoStackView.heightAnchor.constraint(equalToConstant: view.frame.size.height / 9),
             cityVerticalWeatherInfoStackView.widthAnchor.constraint(equalToConstant: view.frame.size.width / 2.5),
         ])
     }
@@ -382,8 +447,35 @@ extension CityWeatherVC {
     private func makeWeatherPhrase() {
         NSLayoutConstraint.activate([
             weatherPhrase.topAnchor.constraint(equalTo: cityHorizontalWeatherInfoStackView.bottomAnchor, constant: 0),
-            weatherPhrase.leftAnchor.constraint(equalTo: cityVerticalWeatherInfoStackView.leftAnchor, constant: 8 + (view.frame.size.width / 14)),
+            weatherPhrase.leftAnchor.constraint(equalTo: cityVerticalWeatherInfoStackView.leftAnchor, constant: 8),
             weatherPhrase.rightAnchor.constraint(equalTo: cityVerticalWeatherInfoStackView.rightAnchor, constant: 0),
         ])
     }
+    
+    private func makeCustomView() {
+        NSLayoutConstraint.activate([
+            customViewinCollection.heightAnchor.constraint(equalToConstant: view.frame.size.height / 2.6),
+            customViewinCollection.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+            customViewinCollection.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
+            customViewinCollection.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
+        ])
+    }
+    
+    private func makeWeatherForecast() {
+        NSLayoutConstraint.activate([
+            weatherForecast.topAnchor.constraint(equalTo: customViewinCollection.topAnchor, constant: 48),
+            weatherForecast.leftAnchor.constraint(equalTo: customViewinCollection.leftAnchor, constant: 0),
+            weatherForecast.rightAnchor.constraint(equalTo: customViewinCollection.rightAnchor, constant: 0),
+        ])
+    }
+    
+    private func makeCollection() {
+        NSLayoutConstraint.activate([
+            forecastCollectionView.topAnchor.constraint(equalTo: weatherForecast.bottomAnchor, constant: 48),
+            forecastCollectionView.leftAnchor.constraint(equalTo: customViewinCollection.leftAnchor, constant: 0),
+            forecastCollectionView.rightAnchor.constraint(equalTo: customViewinCollection.rightAnchor, constant: 0),
+            forecastCollectionView.heightAnchor.constraint(equalToConstant: view.frame.size.height / 5),
+        ])
+    }
+   
 }

@@ -87,7 +87,7 @@ enum Unit: String, Codable {
  //MARK: - Headline
 
 struct Headline: Codable {
-    let effectiveDate: Date?
+    let effectiveDate: String?
     let effectiveEpochDate, severity: Int?
     let text, category: String?
     let mobileLink, link: String?
