@@ -36,4 +36,19 @@ final class WeatherNetworkConstant {
             return "\(path_url.rawValue)\(forecasts_url.rawValue)\(daily_url.rawValue)\(key)\(key_url.rawValue)"
         }
     }
+    
+// http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&q=37.33233141,-122.0312186
+    
+    enum GeopositionNetwork: String {
+        case path_url = "https://dataservice.accuweather.com/"
+        case locations_url = "locations/"
+        case city_url = "v1/cities/geoposition/"
+        case searc_url = "search"
+        case key_url = "?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&"
+        case q_url = "q="
+        
+        static func geopositionURL(geoposition: String) -> String {
+            return "\(path_url.rawValue)\(locations_url.rawValue)\(city_url.rawValue)\(searc_url.rawValue)\(key_url.rawValue)\(q_url.rawValue)\(geoposition)"
+        }
+    }
 }

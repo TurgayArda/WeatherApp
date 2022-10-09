@@ -32,19 +32,22 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
     private lazy var  weatherDate: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .boldSystemFont(ofSize: 16)
-        label.textColor = .black
+        label.font = .systemFont(ofSize: 15)
+        label.textColor = .black.withAlphaComponent(0.75)
+        label.textAlignment = .center
         return label
     }()
     
     private lazy var weathertemperature: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .boldSystemFont(ofSize: 15)
-        label.textColor = .black
+        label.font = .systemFont(ofSize: 15)
+        label.textColor = .black.withAlphaComponent(0.75)
         label.textAlignment = .center
         return label
     }()
+    
+    var cellViewModel: CityWeatherCollectionCellViewModelProtocol?
     
     enum Identifier: String {
         case path = "Cell"
@@ -65,13 +68,7 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
         stackView.addArrangedSubview(weatherIcon)
         stackView.addArrangedSubview(weatherDate)
         stackView.addArrangedSubview(weathertemperature)
-        
-        
-//        contentView.backgroundColor = .white
-//        contentView.layer.borderWidth = 1
-//        contentView.layer.borderColor = UIColor.gray.cgColor
-//        contentView.layer.cornerRadius = 8
-        
+    
         configureConstraints()
     }
     
@@ -83,11 +80,10 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
     }
     
     private func propertyUI(item: DailyForecast) {
-        guard let date = item.date , let temperature = item.temperature?.minimum?.value, let image = item.day?.icon else { return }
-//
-        weatherDate.text = date
-        weathertemperature.text = "\(temperature)" + "°"
-        weatherIcon.image = UIImage(named: "Image-\(image)")
+        weatherDate.text = cellViewModel?.getCityDate(data: item)
+        weathertemperature.text = cellViewModel?.getCityTemperature(data: item)
+        let icon = cellViewModel?.getCityWeaterImage(data: item)
+        weatherIcon.image = UIImage(named: icon ?? "Icon-1")
     }
     
     func saveModel(item: DailyForecast) {

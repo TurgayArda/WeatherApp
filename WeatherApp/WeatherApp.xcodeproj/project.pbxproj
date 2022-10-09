@@ -25,6 +25,7 @@
 		CB309AD628F1A35E003BA378 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = CB309AD528F1A35E003BA378 /* Lottie */; };
 		CB309ADA28F1ACFE003BA378 /* location.json in Resources */ = {isa = PBXBuildFile; fileRef = CB309AD928F1ACFE003BA378 /* location.json */; };
 		CB309ADC28F1E272003BA378 /* ForecastsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB309ADB28F1E272003BA378 /* ForecastsModel.swift */; };
+		CBEA240428F2DDA5004988BF /* GeopositionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBEA240328F2DDA5004988BF /* GeopositionModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		CB309ACD28F17BBF003BA378 /* SearchCityWeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCityWeatherModel.swift; sourceTree = "<group>"; };
 		CB309AD928F1ACFE003BA378 /* location.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = location.json; sourceTree = "<group>"; };
 		CB309ADB28F1E272003BA378 /* ForecastsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForecastsModel.swift; sourceTree = "<group>"; };
+		CBEA240328F2DDA5004988BF /* GeopositionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeopositionModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +163,7 @@
 			children = (
 				CB309ACD28F17BBF003BA378 /* SearchCityWeatherModel.swift */,
 				CB309ADB28F1E272003BA378 /* ForecastsModel.swift */,
+				CBEA240328F2DDA5004988BF /* GeopositionModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -265,6 +268,7 @@
 				CB309ACE28F17BBF003BA378 /* SearchCityWeatherModel.swift in Sources */,
 				CB309ADC28F1E272003BA378 /* ForecastsModel.swift in Sources */,
 				CB309AB528F155DD003BA378 /* CityWeatherCollectionViewCell.swift in Sources */,
+				CBEA240428F2DDA5004988BF /* GeopositionModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +407,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 36J2F6NXKC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WeatherApp/Supporting Files/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -429,6 +434,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 36J2F6NXKC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WeatherApp/Supporting Files/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -27,6 +27,8 @@ extension CityWeatherProvider: UICollectionViewDataSource, UICollectionViewDeleg
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CityWeatherCollectionViewCell.Identifier.path.rawValue, for: indexPath) as? CityWeatherCollectionViewCell else {
             return UICollectionViewCell()
         }
+        
+        cell.cellViewModel = CityWeatherCollectionCellViewModel()
        
         cell.saveModel(item: dailyForecastData[indexPath.row])
         
@@ -40,8 +42,8 @@ extension CityWeatherProvider: UICollectionViewDataSource, UICollectionViewDeleg
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 20, right: 10)
         flowLayout.minimumInteritemSpacing = 10
         flowLayout.minimumLineSpacing = 20
-        let width = (with / 3.6)
-        let height = width * 1.2
+        let width = (with / 4)
+        let height = width * 1
         return CGSize(width: width, height: height)
     }
 }

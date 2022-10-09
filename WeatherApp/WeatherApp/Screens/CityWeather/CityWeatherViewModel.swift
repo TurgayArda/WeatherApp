@@ -47,3 +47,18 @@ extension CityWeatherViewModel {
         })
     }
 }
+
+extension CityWeatherViewModel {
+    func loadGeoposition(geoposition: String) {
+        guard let url = URL(string: WeatherNetworkConstant.GeopositionNetwork.geopositionURL(geoposition: geoposition)) else { return }
+        httpClient?.fetch(url: url,
+                          completion: { [delegate] (result: Result<GeopositionResult, Error>) in
+            switch result {
+        case .success(let geoposition):
+                delegate?.geopositionHandleOutPut(.searchGeoposition(geoposition))
+        case .failure(let error):
+                delegate?.geopositionHandleOutPut(.showError(error))
+            }
+        })
+    }
+}

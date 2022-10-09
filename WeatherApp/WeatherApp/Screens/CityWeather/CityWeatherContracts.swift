@@ -13,6 +13,7 @@ protocol CityWeatherViewModelProtocol {
     var delegate: CityWeatherViewModelDelegate? { get set }
     func loadSearchCity(term: String)
     func loadForecast(key: String)
+    func loadGeoposition(geoposition: String)
 }
 
 enum CityWeatherViewModelOutPut {
@@ -25,9 +26,15 @@ enum ForecastViewModelOutPut {
     case showError(Error)
 }
 
+enum GeopositionViewModelOutPut {
+    case searchGeoposition(GeopositionResult)
+    case showError(Error)
+}
+
 protocol CityWeatherViewModelDelegate {
     func handleOutPut(_ output: CityWeatherViewModelOutPut)
     func forecastHandleOutPut(_ output: ForecastViewModelOutPut)
+    func geopositionHandleOutPut(_ output: GeopositionViewModelOutPut)
 }
 
 //MARK: - Provider

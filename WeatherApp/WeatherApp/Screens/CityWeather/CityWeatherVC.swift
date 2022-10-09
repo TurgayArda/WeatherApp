@@ -7,6 +7,7 @@
 
 import UIKit
 import Lottie
+import CoreLocation
 
 class CityWeatherVC: UIViewController {
 
@@ -175,12 +176,15 @@ class CityWeatherVC: UIViewController {
                                    )
              return collectionView
          }()
+    
+    private lazy var locatoinManager = CLLocationManager()
      
     //MARK: - Properties
     private var forecastCollectionProvider = CityWeatherProvider()
     private var dailyForecastData: [DailyForecast] = []
     private var searchCityName = ""
     private var searchDateTime = ""
+    private var currentLocation: CLLocation?
     
     var cityWeatherViewModel: CityWeatherViewModelProtocol?
     
@@ -190,15 +194,26 @@ class CityWeatherVC: UIViewController {
         super.viewDidLoad()
 
         initDelegate()
+       
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        setupLocation()
     }
     
     //MARK: - Private Func
+    
+    private func setupLocation() {
+        locatoinManager.delegate = self
+        locatoinManager.requestWhenInUseAuthorization()
+        locatoinManager.startUpdatingLocation()
+    }
     
     private func initDelegate() {
         navigationItem.searchController = searchBar
         searchBar.searchBar.delegate = self
         cityWeatherViewModel?.delegate = self
-        forecastCollectionProvider.delegate = self
+        //forecastCollectionProvider.delegate = self
         forecastCollectionView.delegate = forecastCollectionProvider
         forecastCollectionView.dataSource = forecastCollectionProvider
         
@@ -211,8 +226,7 @@ class CityWeatherVC: UIViewController {
         view.addSubview(cityVerticalLocationStackView)
         view.addSubview(cityVerticalWeatherInfoStackView)
         view.addSubview(customViewinCollection)
-       
-    
+
         cityVerticalLocationStackView.addArrangedSubview(cityHorizontalLocationStackView)
         cityVerticalLocationStackView.addArrangedSubview(dateTime)
         
@@ -253,9 +267,6 @@ class CityWeatherVC: UIViewController {
     }
     
     private func configureAnimation() {
-        //locationAnimationView = .init(name: "location")
-        //locationAnimationView.contentMode = .scaleAspectFit
-        //locationAnimationView.loopMode = .loop
         locationAnimationView.animationSpeed = 0.7
         locationAnimationView.play()
     }
@@ -307,6 +318,24 @@ class CityWeatherVC: UIViewController {
     }
 }
 
+extension CityWeatherVC: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if !locations.isEmpty, currentLocation == nil {
+            currentLocation = locations.first
+            locatoinManager.startUpdatingLocation()
+            requestWeatherForLocation()
+        }
+    }
+    
+    func requestWeatherForLocation() {
+        guard let currentLocation = currentLocation else { return }
+        let longLocation = currentLocation.coordinate.longitude
+        let latLocation = currentLocation.coordinate.latitude
+        
+        cityWeatherViewModel?.loadGeoposition(geoposition: "\(latLocation),\(longLocation)")
+    }
+}
+
 extension CityWeatherVC: CityWeatherViewModelDelegate {
     func handleOutPut(_ output: CityWeatherViewModelOutPut) {
         switch output {
@@ -340,6 +369,17 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
             print(error)
         }
     }
+    
+    func geopositionHandleOutPut(_ output: GeopositionViewModelOutPut) {
+        switch output {
+        case .searchGeoposition(let geoposition):
+            guard let key = geoposition.key, let cityName = geoposition.administrativeArea?.englishName else { return }
+            cityWeatherViewModel?.loadForecast(key: key)
+            cityWeatherViewModel?.loadSearchCity(term: cityName)
+        case .showError(let error):
+            print(error)
+        }
+    }
 }
 
 extension CityWeatherVC: UISearchBarDelegate {
@@ -355,11 +395,11 @@ extension CityWeatherVC: UISearchBarDelegate {
     }
 }
 
-extension CityWeatherVC: CityWeatherProviderDelegate {
-    func selected(at select: Any) {
-        print("Arda")
-    }
-}
+//extension CityWeatherVC: CityWeatherProviderDelegate {
+//    func selected(at select: Any) {
+//        print("Arda")
+//    }
+//}
 
 extension CityWeatherVC {
     private func makeBackGroundImage() {
@@ -451,7 +491,7 @@ extension CityWeatherVC {
             weatherPhrase.rightAnchor.constraint(equalTo: cityVerticalWeatherInfoStackView.rightAnchor, constant: 0),
         ])
     }
-    
+
     private func makeCustomView() {
         NSLayoutConstraint.activate([
             customViewinCollection.heightAnchor.constraint(equalToConstant: view.frame.size.height / 2.6),
