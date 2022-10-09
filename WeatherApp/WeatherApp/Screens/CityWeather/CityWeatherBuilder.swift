@@ -9,8 +9,10 @@ import Foundation
 
 final class CityWeatherBuilder {
     static func make() -> CityWeatherVC {
-        let view = CityWeatherVC()
-        view.cityWeatherViewModel = CityWeatherViewModel(httpClient: HttpClient())
+        let client = HttpClient(client: URLSession.shared)
+        let viewModel = CityWeatherViewModel(httpClient: client,
+                                             lastSearchManager: LastSearchManager())
+        let view = CityWeatherVC(viewModel: viewModel)
         return view
     }
 }

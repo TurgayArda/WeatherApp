@@ -24,8 +24,10 @@ class CityWeatherVC: UIViewController {
     
     private lazy var searchBar: UISearchController = {
         let search = UISearchController()
-        search.searchBar.placeholder = "search Podcast"
+        search.searchBar.placeholder = "City Name"
         search.searchBar.showsCancelButton = true
+        search.searchBar.tintColor = .white
+        search.searchBar.barTintColor = .white
         return search
     }()
     
@@ -177,6 +179,12 @@ class CityWeatherVC: UIViewController {
              return collectionView
          }()
     
+    private lazy var lastSearchView: LastSearchView = {
+        let view = LastSearchView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private lazy var locatoinManager = CLLocationManager()
      
     //MARK: - Properties
@@ -186,7 +194,19 @@ class CityWeatherVC: UIViewController {
     private var searchDateTime = ""
     private var currentLocation: CLLocation?
     
-    var cityWeatherViewModel: CityWeatherViewModelProtocol?
+    private var cityWeatherViewModel: CityWeatherViewModelProtocol
+
+    
+    // MARK: Init
+    
+    init(viewModel: CityWeatherViewModelProtocol) {
+        self.cityWeatherViewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     //MARK: - Life Cycle
     
@@ -194,7 +214,6 @@ class CityWeatherVC: UIViewController {
         super.viewDidLoad()
 
         initDelegate()
-       
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -212,8 +231,7 @@ class CityWeatherVC: UIViewController {
     private func initDelegate() {
         navigationItem.searchController = searchBar
         searchBar.searchBar.delegate = self
-        cityWeatherViewModel?.delegate = self
-        //forecastCollectionProvider.delegate = self
+        cityWeatherViewModel.delegate = self
         forecastCollectionView.delegate = forecastCollectionProvider
         forecastCollectionView.dataSource = forecastCollectionProvider
         
@@ -222,11 +240,13 @@ class CityWeatherVC: UIViewController {
     
     private func configure() {
         view.backgroundColor = .white
+        
         view.addSubview(viewBackGroundImage)
         view.addSubview(cityVerticalLocationStackView)
         view.addSubview(cityVerticalWeatherInfoStackView)
         view.addSubview(customViewinCollection)
-
+        configureLastSearchView()
+        
         cityVerticalLocationStackView.addArrangedSubview(cityHorizontalLocationStackView)
         cityVerticalLocationStackView.addArrangedSubview(dateTime)
         
@@ -243,7 +263,7 @@ class CityWeatherVC: UIViewController {
         customViewinCollection.addSubview(forecastCollectionView)
         
         viewBackGroundImage.image = UIImage(named: "Daytime")
-        
+
         configureConstraints()
     }
     
@@ -262,8 +282,14 @@ class CityWeatherVC: UIViewController {
         makeWeatherPhrase()
         makeCustomView()
         makeWeatherForecast()
-        
+        makeSearchLastView()
         configureAnimation()
+    }
+    
+    private func configureLastSearchView() {
+        view.addSubview(lastSearchView)
+        lastSearchView.output = self
+        lastSearchView.updateViewModel(viewModel: LastSearchViewModel(lastSearchManager: cityWeatherViewModel.getManager()))
     }
     
     private func configureAnimation() {
@@ -271,6 +297,7 @@ class CityWeatherVC: UIViewController {
         locationAnimationView.play()
     }
     
+    // MARK: ViewModel'a tasi
     private func todayDate(dailyForecast: [DailyForecast]) {
         let todayDate = todayDateFormatter.string(from: .now)
         let stringHour = hourDateFormatter.string(from: .now)
@@ -313,6 +340,7 @@ class CityWeatherVC: UIViewController {
         }
     }
     
+    // MARK: ViewMidel
     func calculateCelsius(fahrenheit: Int) -> Int {
         return Int(5.0 / 9.0 * (Double(fahrenheit) - 32.0))
     }
@@ -332,7 +360,7 @@ extension CityWeatherVC: CLLocationManagerDelegate {
         let longLocation = currentLocation.coordinate.longitude
         let latLocation = currentLocation.coordinate.latitude
         
-        cityWeatherViewModel?.loadGeoposition(geoposition: "\(latLocation),\(longLocation)")
+        cityWeatherViewModel.loadGeoposition(geoposition: "\(latLocation),\(longLocation)")
     }
 }
 
@@ -340,13 +368,13 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
     func handleOutPut(_ output: CityWeatherViewModelOutPut) {
         switch output {
         case .showCityWeather(let cityWeather):
-            searchCityName = cityWeather[0].localizedName ?? ""
+            //urfa crash
             DispatchQueue.main.async {
-                self.cityName.text = cityWeather[0].localizedName ?? ""
+                self.searchCityName = cityWeather.localizedName ?? ""
+                self.cityName.text = cityWeather.localizedName ?? ""
+                self.setLastSerchVisible(isVisible: true)
             }
-            guard let key = cityWeather[0].key else { return }
-            cityWeatherViewModel?.loadForecast(key: key)
-            print(cityWeather[0].localizedName ?? "")
+            cityWeatherViewModel.loadForecast(key: cityWeather.key ?? "")
         case .showError(let error):
             print(error)
         }
@@ -373,33 +401,57 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
     func geopositionHandleOutPut(_ output: GeopositionViewModelOutPut) {
         switch output {
         case .searchGeoposition(let geoposition):
-            guard let key = geoposition.key, let cityName = geoposition.administrativeArea?.englishName else { return }
-            cityWeatherViewModel?.loadForecast(key: key)
-            cityWeatherViewModel?.loadSearchCity(term: cityName)
+            guard let key = geoposition.key,
+                  let cityName = geoposition.administrativeArea?.englishName else { return }
+            cityWeatherViewModel.loadForecast(key: key)
+            cityWeatherViewModel.loadSearchCity(term: cityName)
         case .showError(let error):
-            print(error)
+            showAlert(error: error.localizedDescription)
+        }
+    }
+    
+    func setLastSerchVisible(isVisible: Bool) {
+        DispatchQueue.main.async {
+            self.lastSearchView.isHidden = isVisible
         }
     }
 }
 
+// MARK: - LastSearchViewOutput
+extension CityWeatherVC: LastSearchViewOutput {
+    func didSelectCity(name: String) {
+        cityWeatherViewModel.loadSearchCity(term: name)
+        setLastSerchVisible(isVisible: false)
+        self.searchBar.searchBar.resignFirstResponder()
+        self.searchBar.searchBar.setShowsCancelButton(true, animated: true)
+    }
+}
+
+// MARK: - UISearchBarDelegate
 extension CityWeatherVC: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text else { return }
-        print(text)
-        cityWeatherViewModel?.loadSearchCity(term: text)
+        guard let text = searchBar.text,
+              !text.isEmpty else { return }
+        cityWeatherViewModel.loadSearchCity(term: text)
+        cityWeatherViewModel.addSearchKey(to: text)
         locationAnimationView.play()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        //cityWeatherViewModel?.loadSearchCity(term: "")
+        setLastSerchVisible(isVisible: true)
     }
-}
-
-//extension CityWeatherVC: CityWeatherProviderDelegate {
-//    func selected(at select: Any) {
-//        print("Arda")
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        lastSearchView.reloadSearchView()
+        setLastSerchVisible(isVisible: false)
+        searchBar.setShowsCancelButton(true, animated: true)
+    }
+    
+//    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+//        searchBar.setShowsCancelButton(false, animated: true)
+//        return true
 //    }
-//}
+}
 
 extension CityWeatherVC {
     private func makeBackGroundImage() {
@@ -517,5 +569,13 @@ extension CityWeatherVC {
             forecastCollectionView.heightAnchor.constraint(equalToConstant: view.frame.size.height / 5),
         ])
     }
-   
+    
+    private func makeSearchLastView() {
+        NSLayoutConstraint.activate([
+            lastSearchView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            lastSearchView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            lastSearchView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            lastSearchView.heightAnchor.constraint(equalToConstant: 232)
+        ])
+    }
 }

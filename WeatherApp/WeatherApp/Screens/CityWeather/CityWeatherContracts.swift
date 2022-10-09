@@ -14,10 +14,12 @@ protocol CityWeatherViewModelProtocol {
     func loadSearchCity(term: String)
     func loadForecast(key: String)
     func loadGeoposition(geoposition: String)
+    func getManager() -> LastSearchManagerProtocol
+    func addSearchKey(to name: String)
 }
 
 enum CityWeatherViewModelOutPut {
-    case showCityWeather([CityWeatherResult])
+    case showCityWeather(CityWeatherResult)
     case showError(String)
 }
 

@@ -16,7 +16,7 @@ final class WeatherNetworkConstant {
         case locations_url = "locations/"
         case city_url = "v1/cities/"
         case searc_url = "search"
-        case key_url = "?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&"
+        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
         case q_url = "q="
         
         static func weatherURL(cityName: String) -> String {
@@ -30,7 +30,7 @@ final class WeatherNetworkConstant {
         case path_url = "https://dataservice.accuweather.com/"
         case forecasts_url = "forecasts/"
         case daily_url = "v1/daily/5day/"
-        case key_url = "?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe"
+        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6"
         
         static func forecastURL(key: String) -> String {
             return "\(path_url.rawValue)\(forecasts_url.rawValue)\(daily_url.rawValue)\(key)\(key_url.rawValue)"
@@ -44,7 +44,7 @@ final class WeatherNetworkConstant {
         case locations_url = "locations/"
         case city_url = "v1/cities/geoposition/"
         case searc_url = "search"
-        case key_url = "?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&"
+        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
         case q_url = "q="
         
         static func geopositionURL(geoposition: String) -> String {

@@ -18,16 +18,18 @@ protocol HttpClientProtocol {
 }
 
 class HttpClient: HttpClientProtocol {
+    
+    private let client: URLSession
+    
+    init(client: URLSession) {
+        self.client = client
+    }
+    
     func fetch<T: Codable>(url: URL,
                            completion: @escaping (Result<T, Error>) -> Void) {
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-
-        URLSession.shared.dataTask(with: request) { (data,respone,error) in
-            if error != nil || data == nil {
-                return
-            }
+        client.dataTask(with: url) { (data,respone,error) in
+            if error != nil || data == nil { return }
 
             do {
                 let weatherdata = try JSONDecoder().decode(T.self, from: data!)
@@ -35,6 +37,7 @@ class HttpClient: HttpClientProtocol {
             } catch {
                 completion(.failure(error))
             }
+            
         }.resume()
     }
 }
