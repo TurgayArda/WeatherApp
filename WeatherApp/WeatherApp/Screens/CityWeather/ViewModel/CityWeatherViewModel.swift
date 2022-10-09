@@ -11,6 +11,7 @@ class CityWeatherViewModel: CityWeatherViewModelProtocol {
     var delegate: CityWeatherViewModelDelegate?
     private var httpClient: HttpClientProtocol?
     private var lastSearchManager: LastSearchManagerProtocol
+    private let parsingError = "parsing error"
     
     init(httpClient: HttpClientProtocol,
          lastSearchManager: LastSearchManagerProtocol) {
@@ -27,7 +28,7 @@ extension CityWeatherViewModel {
             switch result {
             case .success(let weather):
                 guard let weather = weather.first else {
-                    delegate?.handleOutPut(.showError("parsing error"))
+                    delegate?.handleOutPut(.showWrongCityName(self.parsingError))
                     return
                 }
                 delegate?.handleOutPut(.showCityWeather(weather))
@@ -43,11 +44,13 @@ extension CityWeatherViewModel {
                           completion: { [delegate] (result: Result<ForecastResult, Error>) in
             switch result {
             case .success(let forecast):
-                if let dailyForecastData = forecast.dailyForecasts {
-                    delegate?.forecastHandleOutPut(.searchForecast(dailyForecastData))
+                guard let dailyForecastData = forecast.dailyForecasts else {
+                    delegate?.forecastHandleOutPut(.showWrongCityForecast(self.parsingError))
+                    return
                 }
+                    delegate?.forecastHandleOutPut(.searchForecast(dailyForecastData))
             case .failure(let error):
-                delegate?.forecastHandleOutPut(.showError(error))
+                delegate?.forecastHandleOutPut(.showError(error.localizedDescription))
             }
         })
     }
@@ -60,7 +63,7 @@ extension CityWeatherViewModel {
             case .success(let geoposition):
                 delegate?.geopositionHandleOutPut(.searchGeoposition(geoposition))
             case .failure(let error):
-                delegate?.geopositionHandleOutPut(.showError(error))
+                delegate?.geopositionHandleOutPut(.showError(error.localizedDescription))
             }
         })
     }

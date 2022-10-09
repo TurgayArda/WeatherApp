@@ -11,7 +11,6 @@ enum HttpError: Error {
     case  errorDecodingData
 }
 
-
 protocol HttpClientProtocol {
     func fetch<T: Codable>(url: URL,
                            completion: @escaping (Result<T, Error>) -> Void)

@@ -2,7 +2,7 @@
 //  LastSearchView.swift
 //  WeatherApp
 //
-// Created by Arda Sisli on 8.10.2022.
+// Created by Arda Sisli on 9.10.2022.
 //
 
 import UIKit
@@ -45,6 +45,8 @@ class LastSearchView: UIView, UICollectionViewDelegate, UICollectionViewDataSour
     
     private func setupContent() {
         backgroundColor = .white
+        self.layer.cornerRadius = 24
+        self.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         layer.opacity = 0.8
         isHidden = true
         setupCosntraints()

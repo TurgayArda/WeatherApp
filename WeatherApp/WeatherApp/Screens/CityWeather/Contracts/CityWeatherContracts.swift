@@ -20,17 +20,19 @@ protocol CityWeatherViewModelProtocol {
 
 enum CityWeatherViewModelOutPut {
     case showCityWeather(CityWeatherResult)
+    case showWrongCityName(String)
     case showError(String)
 }
 
 enum ForecastViewModelOutPut {
     case searchForecast([DailyForecast])
-    case showError(Error)
+    case showWrongCityForecast(String)
+    case showError(String)
 }
 
 enum GeopositionViewModelOutPut {
     case searchGeoposition(GeopositionResult)
-    case showError(Error)
+    case showError(String)
 }
 
 protocol CityWeatherViewModelDelegate {

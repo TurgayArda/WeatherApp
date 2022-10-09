@@ -9,6 +9,8 @@ import Foundation
 
 final class WeatherNetworkConstant {
     
+    static let apikey = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
+    
     // http://dataservice.accuweather.com/locations/v1/cities/search?apikey=L7xhkt0dIi6C2TqUGkgt47tjGsmnH0XL&q=istanbul
     
     enum WeatherNetwork: String {
@@ -16,11 +18,10 @@ final class WeatherNetworkConstant {
         case locations_url = "locations/"
         case city_url = "v1/cities/"
         case searc_url = "search"
-        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
         case q_url = "q="
         
         static func weatherURL(cityName: String) -> String {
-            return "\(path_url.rawValue)\(locations_url.rawValue)\(city_url.rawValue)\(searc_url.rawValue)\(key_url.rawValue)\(q_url.rawValue)\(cityName)"
+            return "\(path_url.rawValue)\(locations_url.rawValue)\(city_url.rawValue)\(searc_url.rawValue)\(apikey)\(q_url.rawValue)\(cityName)"
         }
     }
     
@@ -30,10 +31,9 @@ final class WeatherNetworkConstant {
         case path_url = "https://dataservice.accuweather.com/"
         case forecasts_url = "forecasts/"
         case daily_url = "v1/daily/5day/"
-        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6"
         
         static func forecastURL(key: String) -> String {
-            return "\(path_url.rawValue)\(forecasts_url.rawValue)\(daily_url.rawValue)\(key)\(key_url.rawValue)"
+            return "\(path_url.rawValue)\(forecasts_url.rawValue)\(daily_url.rawValue)\(key)\(apikey)"
         }
     }
     
@@ -44,11 +44,10 @@ final class WeatherNetworkConstant {
         case locations_url = "locations/"
         case city_url = "v1/cities/geoposition/"
         case searc_url = "search"
-        case key_url = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
         case q_url = "q="
         
         static func geopositionURL(geoposition: String) -> String {
-            return "\(path_url.rawValue)\(locations_url.rawValue)\(city_url.rawValue)\(searc_url.rawValue)\(key_url.rawValue)\(q_url.rawValue)\(geoposition)"
+            return "\(path_url.rawValue)\(locations_url.rawValue)\(city_url.rawValue)\(searc_url.rawValue)\(apikey)\(q_url.rawValue)\(geoposition)"
         }
     }
 }

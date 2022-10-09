@@ -24,7 +24,7 @@ class CityWeatherVC: UIViewController {
     
     private lazy var searchBar: UISearchController = {
         let search = UISearchController()
-        search.searchBar.placeholder = "City Name"
+        search.searchBar.placeholder = CityWeatherConstant.CityWeaterUIConstant.searchBarPlaceholder.rawValue
         search.searchBar.showsCancelButton = true
         search.searchBar.tintColor = .white
         search.searchBar.barTintColor = .white
@@ -101,7 +101,7 @@ class CityWeatherVC: UIViewController {
         label.font = .boldSystemFont(ofSize: 22)
         label.textColor = .black
         label.numberOfLines = 1
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.backgroundColor = .clear
         return label
     }()
@@ -119,7 +119,7 @@ class CityWeatherVC: UIViewController {
         label.font = .boldSystemFont(ofSize: 18)
         label.textColor = .black
         label.numberOfLines = 1
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.backgroundColor = .clear
         label.adjustsFontSizeToFitWidth = true
         return label
@@ -129,8 +129,8 @@ class CityWeatherVC: UIViewController {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
-        stackView.alignment = .lastBaseline
-        stackView.distribution = .equalSpacing
+        //stackView.alignment = .center
+        stackView.distribution = .equalCentering
         stackView.backgroundColor = .clear
         return stackView
     }()
@@ -161,8 +161,7 @@ class CityWeatherVC: UIViewController {
         label.font = .boldSystemFont(ofSize: 22)
         label.textColor = .black
         label.textAlignment = .center
-        label.text = "Weather Forecast"
-        //label.backgroundColor = .clear
+        label.text = CityWeatherConstant.CityWeaterUIConstant.weatherForecast.rawValue
         return label
     }()
     
@@ -174,7 +173,7 @@ class CityWeatherVC: UIViewController {
              collectionView.backgroundColor = .white
             collectionView.register(
                 CityWeatherCollectionViewCell.self,
-            forCellWithReuseIdentifier: CityWeatherCollectionViewCell.Identifier.path.rawValue
+            forCellWithReuseIdentifier: CityWeatherCollectionViewCell.reuseIdentifier
                                    )
              return collectionView
          }()
@@ -346,6 +345,8 @@ class CityWeatherVC: UIViewController {
     }
 }
 
+//MARK: - CLLocationManagerDelegate
+
 extension CityWeatherVC: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if !locations.isEmpty, currentLocation == nil {
@@ -364,11 +365,12 @@ extension CityWeatherVC: CLLocationManagerDelegate {
     }
 }
 
+//MARK: - CityWeatherViewModelDelegate
+
 extension CityWeatherVC: CityWeatherViewModelDelegate {
     func handleOutPut(_ output: CityWeatherViewModelOutPut) {
         switch output {
         case .showCityWeather(let cityWeather):
-            //urfa crash
             DispatchQueue.main.async {
                 self.searchCityName = cityWeather.localizedName ?? ""
                 self.cityName.text = cityWeather.localizedName ?? ""
@@ -376,7 +378,14 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
             }
             cityWeatherViewModel.loadForecast(key: cityWeather.key ?? "")
         case .showError(let error):
-            print(error)
+            self.showAlert(error: error,
+                           actionTitle: CityWeatherConstant.CityWeatherAlertConstant.errorAction.rawValue)
+        case .showWrongCityName(_):
+            DispatchQueue.main.async {
+                self.lastSearchView.isHidden = true
+                self.showAlert(error: CityWeatherConstant.CityWeatherAlertConstant.wrongCityName.rawValue,
+                               actionTitle: CityWeatherConstant.CityWeatherAlertConstant.WrongActionTitle.rawValue)
+            }
         }
     }
     
@@ -394,7 +403,14 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
                 self.forecastCollectionView.reloadData()
             }
         case .showError(let error):
-            print(error)
+            self.showAlert(error: error,
+                           actionTitle: CityWeatherConstant.CityWeatherAlertConstant.errorAction.rawValue)
+        case .showWrongCityForecast(_):
+            DispatchQueue.main.async {
+                self.lastSearchView.isHidden = true
+                self.showAlert(error: CityWeatherConstant.CityWeatherAlertConstant.wrongCityKey.rawValue,
+                               actionTitle:  CityWeatherConstant.CityWeatherAlertConstant.WrongActionTitle.rawValue)
+            }
         }
     }
     
@@ -406,7 +422,8 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
             cityWeatherViewModel.loadForecast(key: key)
             cityWeatherViewModel.loadSearchCity(term: cityName)
         case .showError(let error):
-            showAlert(error: error.localizedDescription)
+            showAlert(error: error,
+                      actionTitle: CityWeatherConstant.CityWeatherAlertConstant.errorAction.rawValue)
         }
     }
     
@@ -417,7 +434,8 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
     }
 }
 
-// MARK: - LastSearchViewOutput
+//MARK: - LastSearchViewOutput
+
 extension CityWeatherVC: LastSearchViewOutput {
     func didSelectCity(name: String) {
         cityWeatherViewModel.loadSearchCity(term: name)
@@ -427,11 +445,11 @@ extension CityWeatherVC: LastSearchViewOutput {
     }
 }
 
-// MARK: - UISearchBarDelegate
+//MARK: - UISearchBarDelegate
+
 extension CityWeatherVC: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let text = searchBar.text,
-              !text.isEmpty else { return }
+        guard let text = searchBar.text else { return }
         cityWeatherViewModel.loadSearchCity(term: text)
         cityWeatherViewModel.addSearchKey(to: text)
         locationAnimationView.play()
@@ -446,18 +464,15 @@ extension CityWeatherVC: UISearchBarDelegate {
         setLastSerchVisible(isVisible: false)
         searchBar.setShowsCancelButton(true, animated: true)
     }
-    
-//    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-//        searchBar.setShowsCancelButton(false, animated: true)
-//        return true
-//    }
 }
+
+//MARK: - Constraint
 
 extension CityWeatherVC {
     private func makeBackGroundImage() {
         NSLayoutConstraint.activate([
             viewBackGroundImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
-            viewBackGroundImage.heightAnchor.constraint(equalToConstant: view.frame.size.height / 1.5),
+            viewBackGroundImage.heightAnchor.constraint(equalToConstant: view.frame.size.height / 1.4),
             viewBackGroundImage.widthAnchor.constraint(equalToConstant: view.frame.size.width),
         ])
     }
@@ -520,19 +535,19 @@ extension CityWeatherVC {
         ])
     }
     
-    private func makeWeatherIcon() {
-        NSLayoutConstraint.activate([
-            weatherIcon.topAnchor.constraint(equalTo: cityHorizontalWeatherInfoStackView.topAnchor, constant: 0),
-            weatherIcon.leftAnchor.constraint(equalTo: temperature.rightAnchor, constant: 8),
-            weatherIcon.heightAnchor.constraint(equalToConstant: view.frame.size.height / 16),
-            temperature.widthAnchor.constraint(equalToConstant: view.frame.size.width / 7),
-        ])
-    }
-    
     private func makeTemperature() {
         NSLayoutConstraint.activate([
             temperature.topAnchor.constraint(equalTo: cityHorizontalWeatherInfoStackView.topAnchor, constant: 0),
             temperature.leftAnchor.constraint(equalTo: cityHorizontalWeatherInfoStackView.leftAnchor, constant: 8),
+        ])
+    }
+    
+    private func makeWeatherIcon() {
+        NSLayoutConstraint.activate([
+            weatherIcon.topAnchor.constraint(equalTo: cityHorizontalWeatherInfoStackView.topAnchor, constant: 0),
+            weatherIcon.leftAnchor.constraint(equalTo: temperature.rightAnchor, constant: 0),
+            weatherIcon.heightAnchor.constraint(equalToConstant: view.frame.size.height / 22),
+            weatherIcon.widthAnchor.constraint(equalToConstant: view.frame.size.width / 5),
         ])
     }
     
@@ -546,7 +561,7 @@ extension CityWeatherVC {
 
     private func makeCustomView() {
         NSLayoutConstraint.activate([
-            customViewinCollection.heightAnchor.constraint(equalToConstant: view.frame.size.height / 2.6),
+            customViewinCollection.heightAnchor.constraint(equalToConstant: view.frame.size.height / 2.8),
             customViewinCollection.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
             customViewinCollection.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
             customViewinCollection.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
@@ -555,7 +570,7 @@ extension CityWeatherVC {
     
     private func makeWeatherForecast() {
         NSLayoutConstraint.activate([
-            weatherForecast.topAnchor.constraint(equalTo: customViewinCollection.topAnchor, constant: 48),
+            weatherForecast.topAnchor.constraint(equalTo: customViewinCollection.topAnchor, constant: 36),
             weatherForecast.leftAnchor.constraint(equalTo: customViewinCollection.leftAnchor, constant: 0),
             weatherForecast.rightAnchor.constraint(equalTo: customViewinCollection.rightAnchor, constant: 0),
         ])
@@ -563,7 +578,7 @@ extension CityWeatherVC {
     
     private func makeCollection() {
         NSLayoutConstraint.activate([
-            forecastCollectionView.topAnchor.constraint(equalTo: weatherForecast.bottomAnchor, constant: 48),
+            forecastCollectionView.topAnchor.constraint(equalTo: weatherForecast.bottomAnchor, constant: 24),
             forecastCollectionView.leftAnchor.constraint(equalTo: customViewinCollection.leftAnchor, constant: 0),
             forecastCollectionView.rightAnchor.constraint(equalTo: customViewinCollection.rightAnchor, constant: 0),
             forecastCollectionView.heightAnchor.constraint(equalToConstant: view.frame.size.height / 5),

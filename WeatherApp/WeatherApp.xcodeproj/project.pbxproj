@@ -231,12 +231,12 @@
 		CB309AB228F15541003BA378 /* CityWeather */ = {
 			isa = PBXGroup;
 			children = (
+				CBEA240828F37A1A004988BF /* Provider */,
+				CBEA240728F37A12004988BF /* Builder */,
+				CBEA240628F37A06004988BF /* Contracts */,
 				CB309AB328F15551003BA378 /* Cell */,
-				CB309AB628F155F1003BA378 /* CityWeatherVC.swift */,
+				CBEA240528F379F6004988BF /* ViewController */,
 				004ED9B528F33D22009A6E32 /* ViewModel */,
-				CB309AC428F16D32003BA378 /* CityWeatherContracts.swift */,
-				CB309AC628F16D3B003BA378 /* CityWeatherBuilder.swift */,
-				CB309AC828F16D45003BA378 /* CityWeatherProvider.swift */,
 			);
 			path = CityWeather;
 			sourceTree = "<group>";
@@ -276,6 +276,38 @@
 				CB309AC028F15664003BA378 /* CityWeatherConstant.swift */,
 			);
 			path = Constant;
+			sourceTree = "<group>";
+		};
+		CBEA240528F379F6004988BF /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				CB309AB628F155F1003BA378 /* CityWeatherVC.swift */,
+			);
+			path = ViewController;
+			sourceTree = "<group>";
+		};
+		CBEA240628F37A06004988BF /* Contracts */ = {
+			isa = PBXGroup;
+			children = (
+				CB309AC428F16D32003BA378 /* CityWeatherContracts.swift */,
+			);
+			path = Contracts;
+			sourceTree = "<group>";
+		};
+		CBEA240728F37A12004988BF /* Builder */ = {
+			isa = PBXGroup;
+			children = (
+				CB309AC628F16D3B003BA378 /* CityWeatherBuilder.swift */,
+			);
+			path = Builder;
+			sourceTree = "<group>";
+		};
+		CBEA240828F37A1A004988BF /* Provider */ = {
+			isa = PBXGroup;
+			children = (
+				CB309AC828F16D45003BA378 /* CityWeatherProvider.swift */,
+			);
+			path = Provider;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

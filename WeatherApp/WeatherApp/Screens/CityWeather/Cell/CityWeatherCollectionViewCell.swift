@@ -48,11 +48,7 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
     }()
     
     var cellViewModel: CityWeatherCollectionCellViewModelProtocol?
-    
-    enum Identifier: String {
-        case path = "Cell"
-    }
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -112,7 +108,6 @@ extension  CityWeatherCollectionViewCell {
     
     private func makeDate() {
         NSLayoutConstraint.activate([
-            //weatherDate.topAnchor.constraint(equalTo: weatherIcon.bottomAnchor, constant: 0),
             weatherDate.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
             weatherDate.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
         ])
@@ -120,7 +115,6 @@ extension  CityWeatherCollectionViewCell {
     
     private func makeTemperature() {
         NSLayoutConstraint.activate([
-            //weathertemperature.topAnchor.constraint(equalTo: weatherDate.bottomAnchor, constant: 0),
             weathertemperature.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),
             weathertemperature.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -8),
         ])

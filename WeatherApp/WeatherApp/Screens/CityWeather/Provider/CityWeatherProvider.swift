@@ -24,7 +24,7 @@ extension CityWeatherProvider: UICollectionViewDataSource, UICollectionViewDeleg
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CityWeatherCollectionViewCell.Identifier.path.rawValue, for: indexPath) as? CityWeatherCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CityWeatherCollectionViewCell.reuseIdentifier, for: indexPath) as? CityWeatherCollectionViewCell else {
             return UICollectionViewCell()
         }
         
@@ -39,9 +39,9 @@ extension CityWeatherProvider: UICollectionViewDataSource, UICollectionViewDeleg
      
         let with = collectionView.bounds.width
         let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 20, right: 10)
-        flowLayout.minimumInteritemSpacing = 10
-        flowLayout.minimumLineSpacing = 20
+        flowLayout.sectionInset = UIEdgeInsets(top: 10, left: with / 10, bottom: 10, right: with / 10)
+//        flowLayout.minimumInteritemSpacing = 20
+//        flowLayout.minimumLineSpacing = 20
         let width = (with / 4)
         let height = width * 1
         return CGSize(width: width, height: height)
