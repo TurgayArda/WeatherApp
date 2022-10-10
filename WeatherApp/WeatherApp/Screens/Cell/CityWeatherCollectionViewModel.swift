@@ -48,7 +48,7 @@ class CityWeatherCollectionCellViewModel: CityWeatherCollectionCellViewModelProt
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         
         if let dateTwo = dateFormatter.date(from: date) {
-        stringDate = forecastDateFormatter.string(from: dateTwo)
+            stringDate = forecastDateFormatter.string(from: dateTwo)
         }
         
         return stringDate

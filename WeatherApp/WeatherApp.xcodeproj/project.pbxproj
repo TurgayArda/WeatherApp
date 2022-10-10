@@ -223,6 +223,7 @@
 		CB309AB128F15537003BA378 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				CB309AB328F15551003BA378 /* Cell */,
 				CB309AB228F15541003BA378 /* CityWeather */,
 			);
 			path = Screens;
@@ -234,7 +235,6 @@
 				CBEA240828F37A1A004988BF /* Provider */,
 				CBEA240728F37A12004988BF /* Builder */,
 				CBEA240628F37A06004988BF /* Contracts */,
-				CB309AB328F15551003BA378 /* Cell */,
 				CBEA240528F379F6004988BF /* ViewController */,
 				004ED9B528F33D22009A6E32 /* ViewModel */,
 			);

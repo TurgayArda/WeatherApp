@@ -129,7 +129,6 @@ class CityWeatherVC: UIViewController {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
-        //stackView.alignment = .center
         stackView.distribution = .equalCentering
         stackView.backgroundColor = .clear
         return stackView
@@ -282,7 +281,6 @@ class CityWeatherVC: UIViewController {
         makeCustomView()
         makeWeatherForecast()
         makeSearchLastView()
-        configureAnimation()
     }
     
     private func configureLastSearchView() {
@@ -296,52 +294,26 @@ class CityWeatherVC: UIViewController {
         locationAnimationView.play()
     }
     
-    // MARK: ViewModel'a tasi
     private func todayDate(dailyForecast: [DailyForecast]) {
         let todayDate = todayDateFormatter.string(from: .now)
         let stringHour = hourDateFormatter.string(from: .now)
-        var backgroundImageTwo = UIImage()
-        var temperatureTwo = ""
-        var weatherPhraseTwo = ""
-        var weatherIconTwo = UIImage()
-        var iconNumber = 0
-        let fahrenheit = dailyForecast[0].temperature?.maximum?.value ?? 0
         let hour = Int(stringHour)!
+        var backgroundImageString = ""
+        var weatherIconString = ""
         
-        switch hour {
-        case 5...18:
-            backgroundImageTwo = UIImage(named:"Daytime")!
-            let fahrenheit =  dailyForecast[0].temperature?.minimum?.value ?? 0
-            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
-            weatherPhraseTwo = dailyForecast[0].day?.iconPhrase ?? ""
-            iconNumber = dailyForecast[0].day?.icon ?? 0
-            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
-        case 18...24:
-            backgroundImageTwo = UIImage(named: "NightDay")!
-            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
-            weatherPhraseTwo = dailyForecast[0].night?.iconPhrase ?? ""
-            iconNumber = dailyForecast[0].night?.icon ?? 0
-            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
-        default:
-            backgroundImageTwo = UIImage(named:"NightDay")!
-            temperatureTwo = "\(calculateCelsius(fahrenheit: fahrenheit))" + "°"
-            weatherPhraseTwo = dailyForecast[0].night?.iconPhrase ?? ""
-            iconNumber = dailyForecast[0].night?.icon ?? 0
-            weatherIconTwo = UIImage(named: "Image-\(iconNumber)")!
-        }
+        cityWeatherViewModel.setupUI(hour: hour)
+        backgroundImageString = cityWeatherViewModel.getBackgroundImage()
+        weatherIconString = cityWeatherViewModel.getweatherIcon()
+
         
         DispatchQueue.main.async {
             self.dateTime.text = todayDate
-            self.viewBackGroundImage.image = backgroundImageTwo
-            self.temperature.text = temperatureTwo
-            self.weatherPhrase.text = weatherPhraseTwo
-            self.weatherIcon.image = weatherIconTwo
+            self.viewBackGroundImage.image = UIImage(named: backgroundImageString)
+            self.temperature.text = self.cityWeatherViewModel.getTemperature()
+            self.weatherPhrase.text = self.cityWeatherViewModel.getWeatherPhrase()
+            self.weatherIcon.image = UIImage(named: weatherIconString)
+            
         }
-    }
-    
-    // MARK: ViewMidel
-    func calculateCelsius(fahrenheit: Int) -> Int {
-        return Int(5.0 / 9.0 * (Double(fahrenheit) - 32.0))
     }
 }
 
@@ -372,6 +344,7 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
         switch output {
         case .showCityWeather(let cityWeather):
             DispatchQueue.main.async {
+                self.configureAnimation()
                 self.searchCityName = cityWeather.localizedName ?? ""
                 self.cityName.text = cityWeather.localizedName ?? ""
                 self.setLastSerchVisible(isVisible: true)
@@ -393,11 +366,7 @@ extension CityWeatherVC: CityWeatherViewModelDelegate {
         switch output {
         case .searchForecast(let forecastData):
             todayDate(dailyForecast: forecastData)
-            dailyForecastData.removeAll()
-            for i in 0...2 {
-                dailyForecastData.append(forecastData[i])
-            }
-            forecastCollectionProvider.load(value: dailyForecastData)
+            forecastCollectionProvider.load(value: forecastData)
             
             DispatchQueue.main.async {
                 self.forecastCollectionView.reloadData()

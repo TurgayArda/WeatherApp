@@ -16,6 +16,11 @@ protocol CityWeatherViewModelProtocol {
     func loadGeoposition(geoposition: String)
     func getManager() -> LastSearchManagerProtocol
     func addSearchKey(to name: String)
+    func setupUI(hour: Int)
+    func getBackgroundImage() -> String
+    func getTemperature() -> String
+    func getWeatherPhrase() -> String
+    func getweatherIcon() -> String
 }
 
 enum CityWeatherViewModelOutPut {

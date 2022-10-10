@@ -19,5 +19,4 @@ final class CityWeatherConstant {
         case WrongActionTitle = "Try Again"
         case errorAction = "Ok"
     }
-   
 }

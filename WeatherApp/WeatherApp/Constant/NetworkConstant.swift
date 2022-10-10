@@ -9,7 +9,7 @@ import Foundation
 
 final class WeatherNetworkConstant {
     
-    static let apikey = "?apikey=f9088HNLqWTWPBFrxKjVZ9XAEyH0weq6&"
+    static let apikey = "?apikey=BX5r9IgzLi5nDAsQ6b434WwN1nCASz54&"
     
     // http://dataservice.accuweather.com/locations/v1/cities/search?apikey=L7xhkt0dIi6C2TqUGkgt47tjGsmnH0XL&q=istanbul
     
@@ -25,7 +25,7 @@ final class WeatherNetworkConstant {
         }
     }
     
-// http://dataservice.accuweather.com/forecasts/v1/daily/5day/318290?apikey=TGCLjSiP16N8CUAgaRzFuL2FQVsmdesL
+    // http://dataservice.accuweather.com/forecasts/v1/daily/5day/318290?apikey=TGCLjSiP16N8CUAgaRzFuL2FQVsmdesL
     
     enum ForecastNetwork: String {
         case path_url = "https://dataservice.accuweather.com/"
@@ -37,7 +37,7 @@ final class WeatherNetworkConstant {
         }
     }
     
-// http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&q=37.33233141,-122.0312186
+    // http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=DTompvH8A8TamnSEn2nIYGNI3pxh6aUe&q=37.33233141,-122.0312186
     
     enum GeopositionNetwork: String {
         case path_url = "https://dataservice.accuweather.com/"

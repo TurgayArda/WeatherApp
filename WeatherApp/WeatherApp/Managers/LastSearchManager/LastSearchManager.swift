@@ -39,7 +39,7 @@ class LastSearchManager: LastSearchManagerProtocol {
                 cityNames.removeFirst()
             }
         }
-
+        
         defaults.set(cityNames, forKey: "asd")
     }
     

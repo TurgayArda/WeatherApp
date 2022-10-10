@@ -35,7 +35,7 @@ class LastSearchView: UIView, UICollectionViewDelegate, UICollectionViewDataSour
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-
+        
         setupContent()
     }
     

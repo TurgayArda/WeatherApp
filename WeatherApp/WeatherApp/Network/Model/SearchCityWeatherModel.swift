@@ -14,7 +14,7 @@ struct CityWeatherResult: Codable {
     let key, type: String?
     let rank: Int?
     let localizedName, englishName: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case version = "Version"
         case key = "Key"

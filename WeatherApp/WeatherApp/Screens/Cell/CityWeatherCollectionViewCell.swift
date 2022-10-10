@@ -48,7 +48,7 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
     }()
     
     var cellViewModel: CityWeatherCollectionCellViewModelProtocol?
-        
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configure()
@@ -64,7 +64,7 @@ class CityWeatherCollectionViewCell: UICollectionViewCell {
         stackView.addArrangedSubview(weatherIcon)
         stackView.addArrangedSubview(weatherDate)
         stackView.addArrangedSubview(weathertemperature)
-    
+        
         configureConstraints()
     }
     
