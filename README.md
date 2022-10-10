@@ -11,3 +11,4 @@ Preferably 3rd party libraries(Snapkit, Alamofire) were not used.
 - [x] Auto layout
 - [x] MVVM Pattern
 - [x] [Lottie](https://github.com/airbnb/lottie-android)
+- [x] UserDefaults
